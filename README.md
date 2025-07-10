@@ -70,7 +70,7 @@ WTFScript is a Jinja2-based macro rendering engine for building structured conte
                   , "jacc / join_accumulate – Apply and join results"
                   , "jcattr / join_collect_attribute – Collect and join attributes"
                   , "sacc / step_accumulate – Group and process lists in steps"
-                  , "flatten - Flatten nested lists in the form [(depth, content), ...]"
+                  , "flatten_structure / flas - Flatten nested lists in the form [(depth, content), ...]"
               )   | unorderedlist
               
               ~ "3 built-in renderers\n"
@@ -133,7 +133,7 @@ These functions are available in all WTF namespaces
 - jacc / join_accumulate – Apply and join results
 - jcattr / join_collect_attribute – Collect and join attributes
 - sacc / step_accumulate – Group and process lists in steps
-- flatten - Flatten nested lists in the form [(depth, content), ...]
+- flatten_structure / flas - Flatten nested lists in the form [(depth, content), ...]
 
 ##### 3 built-in renderers
 
