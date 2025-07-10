@@ -1,0 +1,3 @@
+{% for level, item in flatten_structure(content) %}{{ '  ' * level }}- {{ item }}
+{% endfor %}
+

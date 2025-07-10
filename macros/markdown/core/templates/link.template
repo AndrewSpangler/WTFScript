@@ -1,0 +1,1 @@
+[{{ content|safe }}]({{ href|safe }}{{ ('  + title + ' ) if title else '' }})

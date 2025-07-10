@@ -1,0 +1,6 @@
+{% set counters = [0] * 10 %}
+{% for level, item in flatten_structure(content) %}
+{% set _ = counters.__setitem__(level, counters[level] + 1) %}
+{% for i in range(level + 1, 10) %}{% set _ = counters.__setitem__(i, 0) %}{% endfor %}
+{{ '  ' * level }}{{ counters[level] }}. {{ item }}
+{% endfor %}
