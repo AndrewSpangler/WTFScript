@@ -50,7 +50,7 @@
             , "jacc / join_accumulate – Apply and join results"
             , "jcattr / join_collect_attribute – Collect and join attributes"
             , "sacc / step_accumulate – Group and process lists in steps"
-            , "flatten_structure / flas - Flatten nested lists in the form [(depth, content), ...]"
+            , "flas / flatten_structure - Flatten nested lists in the form [(depth, content), ...]"
         )   | unorderedlist
         
         ~ "3 built-in renderers\n"
