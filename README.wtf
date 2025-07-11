@@ -64,7 +64,7 @@
             (
                 "Integrated pretty-printer"
                 , "Works great with Flask and SQLAlchemy"
-                , "from WTFScript import WTFHTML as WTF"
+                , "from WTFScript import WTFHtml as WTF"
                     | code
                 , ("\n{# example.html.wtf #}\n"+html_script.strip()).split("\n")
                     | jacc(codeblock, join_string="\n  ")

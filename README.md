@@ -87,7 +87,7 @@ WTFScript is a Jinja2-based macro rendering engine for building structured conte
                   (
                       "Integrated pretty-printer"
                       , "Works great with Flask and SQLAlchemy"
-                      , "from WTFScript import WTFHTML as WTF"
+                      , "from WTFScript import WTFHtml as WTF"
                           | code
                       , ("\n{# example.html.wtf #}\n"+html_script.strip()).split("\n")
                           | jacc(codeblock, join_string="\n  ")
@@ -148,7 +148,7 @@ These functions are available in all WTF namespaces
 
   - Integrated pretty-printer
   - Works great with Flask and SQLAlchemy
-  - `from WTFScript import WTFHTML as WTF`
+  - `from WTFScript import WTFHtml as WTF`
   -       
         {# example.html.wtf #}
         {{
