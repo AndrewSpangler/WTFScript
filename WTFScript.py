@@ -242,9 +242,9 @@ class WTFScript:
         self.env.globals[name] = callback
 
         if "." in name:
-            ns, _name = name.split(".")
-            ns = getattr(self, ns)
-            setattr(ns, _name, callback)
+            namespace, _name = name.split(".")
+            namespace = getattr(self, namespace)
+            setattr(namespace, _name, callback)
         else:
             setattr(self, name, callback)
 

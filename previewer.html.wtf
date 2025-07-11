@@ -1,96 +1,108 @@
+{% set header_height = 41 %}
+{% set button_height = 40 %}
+{% set column_ratio = 0.4 %}
+{% set left_percent = int(column_ratio * 100) %}
+{% set right_percent = 100 - left_percent %}
 {{
   doctype()
-  ~ (
+  ~(
     (
       "Editor + Viewer"
         | title
-      ~ script(
-        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js",
-        crossorigin="anonymous"
+      ~ link(crossorigin="anonymous", rel="stylesheet", href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css")
+      ~ link(rel="stylesheet", href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css")
+      ~ link(rel="stylesheet", href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/monokai.min.css")
+      ~ script(src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js")
+      ~ script(src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/htmlmixed/htmlmixed.min.js")
+      ~ script(crossorigin="anonymous", src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js")
+      ~ style(
+        """
+        .fill-vert {
+          height: calc(100vh - """ ~ (button_height + header_height - 2) ~ """px);
+          min-height: calc(100vh - """ ~ (button_height + header_height - 2) ~ """px);
+          max-height: calc(100vh - """ ~ (button_height + header_height - 2) ~ """px);
+          border: 0;
+          outline: 0;
+          margin: 0;
+          padding: 0;
+        }
+        .left-column {
+          width: """ ~ left_percent ~ """%;
+          min-width: """ ~ left_percent ~ """%;
+          max-width: """ ~ left_percent ~ """%;
+        }
+        .right-column {
+          width: """ ~ right_percent ~ """%;
+          min-width: """ ~ right_percent ~ """%;
+          max-width: """ ~ right_percent ~ """%;
+        }
+        .no-mp {
+          margin: 0;
+          padding: 0;
+          outline: 0;
+          border: 0;
+        }
+        .top-header = {
+          height: """ ~ header_height ~ """px;
+          min-height: """ ~ header_height ~ """px;
+          max-height: """ ~ header_height ~ """px;
+          line-height: unset;
+        }
+        .bottom-button {
+          height: """ ~ button_height ~ """px;
+          min-height: """ ~ button_height ~ """px;
+          max-height: """ ~ button_height ~ """px;
+          border-radius: 0px;
+        }
+        """
       )
-      ~ link(
-        rel="stylesheet",
-        href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css",
-      )
-      ~ link(
-        rel="stylesheet",
-        href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/monokai.min.css"
-      )
-      ~ script(
-        src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js",
-      )
-      ~ script(
-        src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/htmlmixed/htmlmixed.min.js",
-      )
-      ~ style()
     ) | head
     ~ (
-      h2("WTFScript Previewer")
-        | bs.card_header("bg-dark text-white py-1 px-2") 
+      "WTFScript Previewer"
+        | h3("text-center bg-secondary text-white top-header")
+        | bs.row("no-mp bg-secondary top-header")
       ~ (
         (
-          (
-            (
-              "Editor"  
-                | h4("mb-0")
-                | bs.card_header("bg-secondary text-white py-1 px-2")
-              ~ (
-                "" 
-                  | textarea(id="editor", name="content", class="form-control", placeholder="WTFScript Here")
-                  | col("h-100")
-              ) | bs.card_body("px-0 py-0", style="max-height:100%; min-height:100%; overflow:auto;")
-            ) | form(
-                "mb-0 h-100",
-                id="previewForm",
-                method="POST",
-                action="",
-                onsubmit="this.target = this.ownerDocument.getElementById('viewerFrame').name",
-            ) | bs.card("card-shadow h-100")
-            ~ (
-              'window.addEventListener("load", function() {'
-                'var textarea = document.getElementById("editor");'
-                'var parent = textarea.parentElement;'
-                'var editor = CodeMirror.fromTextArea(textarea, {'
-                  'lineNumbers: true,'
-                  'mode: "htmlmixed",'
-                  'lineWrapping: true,'
-                  'theme: "monokai"'
-                '});'
-                'editor.setSize("100%", "75vh");'
-              '});'
-            ) | script
-          ),
-          (
-            (
-              "Viewer"
-                | h4("mb-0")
-                | bs.card_header("bg-secondary text-white py-1 px-2")
-              ~ iframe(
-                "",
-                name="viewerFrame",
-                id="viewerFrame",
-                style="width:99%; height:99%; border:0px;",
-                sandbox="allow-same-origin allow-scripts allow-forms"
-              ) | bs.card_body("px-0 py-0 mx-0 my-0", style="overflow:auto;")
-            ) | bs.card("card-shadow h-100")
-          )
-        ) | jacc(bs.col_6, classes="my-0 mx-0 px-0 py-0")
-          | bs.row("justify-content-center", style="height:100%;")
-        ~ "Render"
-          | button(
-            type="submit",
-            class="btn btn-primary text-small mt-2 mb-1 w-50 py-1 px-1 mx-auto d-block",
-            style="max-width:400px;",
-            form="previewForm"
-          ) | bs.col
-            | bs.row
-      ) | bs.container_fluid("container-xxl px-4 py-0", style="max-width:100000px; max-height:10000px;")
-        | bs.card_body("pt-0 px-0 mt-0 mx-0")
-    ) | bs.card("h-100")
-      | bs.col
-      | bs.row("justify-content-center", style="height:100%;")
-      | bs.container_fluid("container-xxl my-0 mx-0 px-2 py-0 w-100 h-100", style="max-width:100000px; max-height:10000px;")
-      | body("h-100")
-    
+          "" 
+            | textarea(
+              id="editor",
+              name="content",
+              classes="fill-vert form-control",
+            ) | div("fill-vert")
+        ) | form(
+          "fill-vert",
+          id="previewForm",
+          method="POST",
+          action="",
+          onsubmit="this.target = this.ownerDocument.getElementById('viewerFrame').name"
+        ) | bs.col_6("fill-vert left-column no-mp")
+        ~ iframe(
+          "",
+          name="viewerFrame",
+          id="viewerFrame",
+          style="width:100%; height:99.9%; border:0;",
+          sandbox="allow-same-origin allow-scripts allow-forms"
+        ) | bs.col_6("fill-vert right-column no-mp", style="overflow:auto;")
+      ) | bs.row("fill-vert no-mp")
+      ~ (
+        'window.addEventListener("load", function() {' ~
+          'var textarea = document.getElementById("editor");' ~
+          'var editor = CodeMirror.fromTextArea(textarea, {' ~
+            'lineNumbers: true,' ~
+            'mode: "htmlmixed",' ~
+            'lineWrapping: true,' ~
+            'theme: "monokai"' ~
+          '});' ~
+          'editor.setSize("100%", "calc(100vh - ' ~ (button_height + header_height - 2) ~ 'px)");'
+        '});'
+      ) | script
+      ~ "Render"
+        | button(
+          type="submit",
+          classes="btn btn-primary text-large w-100 mx-auto d-block no-mp bottom-button",
+          form="previewForm",
+          style="border-radius:0px;"
+        ) | bs.row("no-mp bottom-button")
+    ) | body("h-100")
   ) | html("h-100")
-  }}
+}}

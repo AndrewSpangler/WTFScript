@@ -238,7 +238,7 @@ def construct_template(tag: str, fields: list[str]) -> str:
     if tag == "doctype":
         return "<!DOCTYPE html>"
     elif tag == "comment":
-        return "<!-- {{ content | safe }} -->"
+        return "<!-- {{ content }} -->"
 
     has_content = tag not in not_has_content
     attr_string = construct_field_snippet(tag, fields).strip()
@@ -248,7 +248,7 @@ def construct_template(tag: str, fields: list[str]) -> str:
     else:
         tag_open = f"<{tag}>"
 
-    tags_need_closing = {"script", "link", "style"}
+    tags_need_closing = {"script", "style"}
 
     if has_content or tag in tags_need_closing:
         return f"{tag_open}{{{{ content | safe }}}}</{tag}>"
