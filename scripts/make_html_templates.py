@@ -180,6 +180,8 @@ tag_bool_fields = {
 }
 
 
+
+
 def html_attr_to_py_name(attr):
     if attr in attr_rename:
         return attr_rename[attr]
@@ -227,6 +229,8 @@ def construct_field_snippet(tag: str, fields: list[str]) -> str:
         html_attr = py_name_to_html_attr(f)
         parts.append(bool_field_template(f, html_attr))
 
+    parts.append('{% for key, value in attrs.items() %}{% if value is not none %}{{ key.replace("_", "-") }}="{{ value | safe }}" {% endif %}{% endfor %}')
+
     return "".join(parts)
 
 
@@ -271,6 +275,8 @@ def construct_header_signature(tag: str, fields: list[str]) -> str:
     for arg in sorted(extras):
         args.append(f'{arg}=""')
 
+    args.append('**attrs')
+
     func_name = rename.get(tag, tag)
     args_str = ", ".join(args)
     return f"def {func_name}({args_str}): pass"
@@ -296,5 +302,10 @@ for tag, tag_specific_fields in tags.items():
 
 
 with open(header_py_path, "w", encoding="utf-8") as f:
-    print(f"Writing - {header_lines}")
-    f.write("\n".join(header_lines) + "\n")
+    file = "\n".join(header_lines)
+    file += """\n
+prefix = ""
+requires=[]
+    """
+    print(f"Writing - {file}")
+    f.write(file)

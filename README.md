@@ -8,7 +8,9 @@ WTFScript is a Jinja2-based macro rendering engine for building structured conte
 - Built-in pretty-printed HTML rendering support
 - Extensible - works with any languge by supplying your own 'core'
 - Write documents once and render it to multiple formats with ease
-- Comes with cores for HTML and Markdown
+- Comes with cores for Markdown, HTML, and Bootstrap (WIP)
+- An simple, self-hosted HTML previewer is available with bs_test.py
+- The previewer is, of course, written in WTFScript as well.
 
 ## Examples
 - Render a heading:
@@ -38,7 +40,9 @@ WTFScript is a Jinja2-based macro rendering engine for building structured conte
                   , "Built-in pretty-printed HTML rendering support" 
                   , "Extensible - works with any languge by supplying your own 'core'"
                   , "Write documents once and render it to multiple formats with ease"
-                  , "Comes with cores for HTML and Markdown"
+                  , "Comes with cores for Markdown, HTML, and Bootstrap (WIP)"
+                  , "An simple, self-hosted HTML previewer is available with bs_test.py"
+                  , "The previewer is, of course, written in WTFScript as well."
                   )   | unorderedlist
           )
           ~ (

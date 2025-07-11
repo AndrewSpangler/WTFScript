@@ -1,0 +1,96 @@
+{{
+  doctype()
+  ~ (
+    (
+      "Editor + Viewer"
+        | title
+      ~ script(
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js",
+        crossorigin="anonymous"
+      )
+      ~ link(
+        rel="stylesheet",
+        href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css",
+      )
+      ~ link(
+        rel="stylesheet",
+        href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/monokai.min.css"
+      )
+      ~ script(
+        src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js",
+      )
+      ~ script(
+        src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/htmlmixed/htmlmixed.min.js",
+      )
+      ~ style()
+    ) | head
+    ~ (
+      h2("WTFScript Previewer")
+        | bs.card_header("bg-dark text-white py-1 px-2") 
+      ~ (
+        (
+          (
+            (
+              "Editor"  
+                | h4("mb-0")
+                | bs.card_header("bg-secondary text-white py-1 px-2")
+              ~ (
+                "" 
+                  | textarea(id="editor", name="content", class="form-control", placeholder="WTFScript Here")
+                  | col("h-100")
+              ) | bs.card_body("px-0 py-0", style="max-height:100%; min-height:100%; overflow:auto;")
+            ) | form(
+                "mb-0 h-100",
+                id="previewForm",
+                method="POST",
+                action="",
+                onsubmit="this.target = this.ownerDocument.getElementById('viewerFrame').name",
+            ) | bs.card("card-shadow h-100")
+            ~ (
+              'window.addEventListener("load", function() {'
+                'var textarea = document.getElementById("editor");'
+                'var parent = textarea.parentElement;'
+                'var editor = CodeMirror.fromTextArea(textarea, {'
+                  'lineNumbers: true,'
+                  'mode: "htmlmixed",'
+                  'lineWrapping: true,'
+                  'theme: "monokai"'
+                '});'
+                'editor.setSize("100%", "75vh");'
+              '});'
+            ) | script
+          ),
+          (
+            (
+              "Viewer"
+                | h4("mb-0")
+                | bs.card_header("bg-secondary text-white py-1 px-2")
+              ~ iframe(
+                "",
+                name="viewerFrame",
+                id="viewerFrame",
+                style="width:99%; height:99%; border:0px;",
+                sandbox="allow-same-origin allow-scripts allow-forms"
+              ) | bs.card_body("px-0 py-0 mx-0 my-0", style="overflow:auto;")
+            ) | bs.card("card-shadow h-100")
+          )
+        ) | jacc(bs.col_6, classes="my-0 mx-0 px-0 py-0")
+          | bs.row("justify-content-center", style="height:100%;")
+        ~ "Render"
+          | button(
+            type="submit",
+            class="btn btn-primary text-small mt-2 mb-1 w-50 py-1 px-1 mx-auto d-block",
+            style="max-width:400px;",
+            form="previewForm"
+          ) | bs.col
+            | bs.row
+      ) | bs.container_fluid("container-xxl px-4 py-0", style="max-width:100000px; max-height:10000px;")
+        | bs.card_body("pt-0 px-0 mt-0 mx-0")
+    ) | bs.card("h-100")
+      | bs.col
+      | bs.row("justify-content-center", style="height:100%;")
+      | bs.container_fluid("container-xxl my-0 mx-0 px-2 py-0 w-100 h-100", style="max-width:100000px; max-height:10000px;")
+      | body("h-100")
+    
+  ) | html("h-100")
+  }}

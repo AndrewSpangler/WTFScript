@@ -110,11 +110,20 @@ for tag, fields in tags.items():
         f.write(template_str + "\n")
     header_lines.append(construct_header_signature(tag, fields))
 
+
 aliases = "\n".join([construct_alias(a,p) for a, p in aliases.items()])
 aliases += f"\naliases = [{alias_names}]"
 
+
 file = "\n".join(header_lines)
+
 file += "\n" + "# Aliases\n" + aliases
 
+file += """\n
+prefix = ""
+requires=[]
+"""
+
 with open(header_py_path, "w", encoding="utf-8") as f:
+    print(f"Writing - {file}")
     f.write(file)

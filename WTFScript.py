@@ -1,4 +1,5 @@
 import os
+import json
 import inspect
 import importlib
 import traceback
@@ -132,6 +133,10 @@ class TemplateRenderer:
     def render(self, **kw) -> str:
         return self.template.render(**kw)
 
+class ModuleNamespace:
+    def __init__(self):
+        pass
+
 class WTFScript:
     reserved = [
         "app", # For future Flask environment (or other app) injection feature 
@@ -176,6 +181,7 @@ class WTFScript:
         self.signatures = {}
         self.dummy_functions = {}
         self.loaded_filters = {}
+        self.module_namespaces = {}
 
         # Create shared Jinja2 environment
         self.env = Environment(loader=BaseLoader())
@@ -188,6 +194,7 @@ class WTFScript:
         for builtin in self.python_binds:
             self._bind(builtin.__name__, builtin)
 
+        # External
         for name, callback in binds.items():
             self._bind(name, callback)
         
@@ -196,9 +203,14 @@ class WTFScript:
     
     def load_macros_dir(self, macros_dir:os.PathLike) -> list[str]:
         """Load dummy functions from headers.py"""
-        self.dummy_functions.update(self._load_dummy_functions(macros_dir))
+        prefix, dummy_functions = self._load_headers_file(macros_dir)
+        self.dummy_functions.update(dummy_functions)
         loaded = []
         macros_dir = os.path.join(macros_dir, "templates")
+        # if prefix:
+        #     setattr(self, prefix, ModuleNamespace())
+        #     print("prefix")
+        #     print(getattr(self, prefix))
         for ent in os.scandir(macros_dir):
             if ent.name.endswith(".template"):
                 name = ent.name[:-9]
@@ -228,18 +240,43 @@ class WTFScript:
             raise ValueError(f"Cannot bind macro {name} - name is reserved.")
         self.env.filters[name] = callback
         self.env.globals[name] = callback
-        setattr(self, name, callback)
 
-    def _load_dummy_functions(self, path: os.PathLike) -> dict:
+        if "." in name:
+            ns, _name = name.split(".")
+            ns = getattr(self, ns)
+            setattr(ns, _name, callback)
+        else:
+            setattr(self, name, callback)
+
+    def _load_headers_file(self, path: os.PathLike) -> dict:
         """Load dummy functions for arg checking and bind helpers."""
         header_path = os.path.join(path, "headers.py")
         spec = importlib.util.spec_from_file_location("header", header_path)
         header_module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(header_module)
 
+        prefix = getattr(header_module, "prefix", "")
+        if prefix:
+            ns = ModuleNamespace()
+            setattr(self, prefix, ns)
+            self.env.filters[prefix] = ns
+            self.env.globals[prefix] = ns
+
+        init = getattr(header_module, "init", None)
+        if init:
+            print(f"Initializing extension at {path}")
+            binds = init(self)
+            print(f"Found {len(binds)} binds")
+
+            new_binds = {(prefix+"."+k):v for k,v in binds.items()}
+            print("new_binds", json.dumps(list(i for i in new_binds.keys())))
+            for k, v in new_binds.items():
+                self._bind(k, v)
+
         all_funcs = {
             name: func
             for name, func in inspect.getmembers(header_module, inspect.isfunction)
+            if not name.startswith("_")
         }
 
         helpers = getattr(header_module, "helpers", [])
@@ -257,23 +294,24 @@ class WTFScript:
                 self._bind(name, filt)
                 all_funcs.pop(name)
 
-        return all_funcs
+        return prefix, all_funcs
 
-    def _make_alias(self, name, parent_name):
+    def _make_alias(self, _name, parent_name):
         def _render_alias(*args, **kwargs):
             return self._render_macro(parent_name, *args, **kwargs)
         return _render_alias
         
 
-    def _make_filter(self, name):
+    def _make_filter(self, _name):
         def _render_filter(*args, **kwargs):
-            return self._render_macro(name, *args, **kwargs)
+            return self._render_macro(_name, *args, **kwargs)
         return _render_filter
 
-    def _render_macro(self, name, *args, **kwargs):
+    def _render_macro(self, _name, *args, **kwargs):
         """
         Renders a macro after confirming argument signature from headers.py
         """ 
+        name = _name
         renderer = self.renderers.get(name)
         sig = self.signatures.get(name)
 
@@ -281,35 +319,83 @@ class WTFScript:
             raise ValueError(f"No macro named '{name}' or missing signature")
 
         try:
-            bound = sig.bind_partial(*args, **kwargs)
-            bound.apply_defaults()
-            context = dict(bound.arguments)
+            # Check if the signature has **kwargs
+            has_var_keyword = any(
+                param.kind == param.VAR_KEYWORD
+                for param
+                in sig.parameters.values()
+            )
+            
+            if has_var_keyword:
+                # If function accepts **kwargs,
+                # Bind and pass the rest as kwargs
+                bound = sig.bind_partial(*args, **kwargs)
+                bound.apply_defaults()
+                context = dict(bound.arguments)
+                # Bind unbound
+                bound_param_names = set(bound.arguments.keys())
+                sig_param_names = set(sig.parameters.keys())
+                # Find unspecified args
+                extra_kwargs = {
+                    k: v
+                    for k, v in kwargs.items()
+                    if k not in sig_param_names
+                }
+                # Bundle as kw
+                if extra_kwargs:
+                    context['kw'] = extra_kwargs
+                else:
+                    context['kw'] = {}
+            else:
+                bound = sig.bind_partial(*args, **kwargs)
+                bound.apply_defaults()
+                context = dict(bound.arguments)
+                
         except TypeError as e:
             raise ValueError(f"Invalid arguments for macro '{name}': {e}")
 
         return renderer.render(**context)
 
     def render(self, content: str, *args, **kw) -> str:
+        print(content)
         template = self.env.from_string(content)
         return template.render(*args, **kw)
 
     def render_template(self, path:os.PathLike, *args, **kw) -> str:
         with open(path, "r") as f:
             content=f.read()
-        return self.render(*args, **kw)
+        return self.render(content, *args, **kw)
     
     
-class WTFHTML(WTFScript):
+class WTFHtml(WTFScript):
     def __init__(self, *args, **kw):
-        WTFScript.__init__(self, *args, **kw)
+        super().__init__(*args, **kw)
         self.load_macros_dir(os.path.join(os.path.dirname(__file__), "macros/html/core"))
 
     def render(self, content: str, *args, **kw) -> str:
-        content = WTFScript.render(self, content, *args, **kw)
-        document_root = html.fromstring(content)
-        content = etree.tostring(document_root, encoding='unicode', pretty_print=True)
+        content = super().render(content, *args, **kw)
+        # document_root = html.fromstring(content)
+        # content = etree.tostring(document_root, encoding='unicode', pretty_print=True)
         return content
 
+
+class WTFHtmlFlask(WTFHtml):
+    def __init__(self, app, *args, **kw):
+        self.app = app
+        WTFHtml.__init__(self, *args, **kw)
+        self.load_macros_dir(os.path.join(os.path.dirname(__file__), "macros/html/core"))
+
+    def _bind(self, name: str, callback: Callable) -> None:
+        """
+        Bind callable as filter/global/method
+        """
+        super()._bind(name, callback)
+        self.app.jinja_env.filters[name] = callback
+        self.app.jinja_env.globals[name] = callback
+
+    def render(self, content: str, *args, **kw) -> str:
+        content = super().render(content, *args, **kw)
+        return content
 
 class WTFMD(WTFScript):
     def __init__(self, *args, **kw):

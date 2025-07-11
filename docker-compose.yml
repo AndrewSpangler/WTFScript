@@ -1,0 +1,13 @@
+services:
+  wtf-previewer:
+    container_name: wtf-previewer
+    hostname: wtf-previewer
+    build:
+      context: .
+      target: builder
+    stop_signal: SIGINT
+    environment:
+      - PYTHONUNBUFFERED=1
+      - TZ=$TZ
+    expose:
+      - 80
