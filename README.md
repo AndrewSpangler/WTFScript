@@ -11,7 +11,7 @@ WTFScript is a Jinja2-based macro rendering engine for building structured conte
 - Comes with cores for Markdown, HTML, and Bootstrap (WIP)
 - A simple, self-hosted HTML previewer is available with previewer.py
 - The previewer is, of course, written in WTFScript.
-- A docker file / compose file are available run the viewer.
+- A docker file / compose file are included to run the viewer.
 
 ## Examples
 - Render a heading:
