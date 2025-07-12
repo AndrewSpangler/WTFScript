@@ -97,7 +97,7 @@ WTFScript is a Jinja2-based macro rendering engine for building structured conte
                   (
                       "Great for generating readme files"
                       , "Useful for generating simple markdown to inject into Flask"
-                      , "from WTFScript import WTFMD as WTF"
+                      , "from WTFScript import WTFMd as WTF"
                           | code
                   )
               )   | unorderedlist
@@ -196,7 +196,7 @@ These functions are available in all WTF namespaces
 
   - Great for generating readme files
   - Useful for generating simple markdown to inject into Flask
-  - `from WTFScript import WTFMD as WTF`
+  - `from WTFScript import WTFMd as WTF`
 
 
 

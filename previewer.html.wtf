@@ -1,4 +1,4 @@
-{% set header_height = 41 %}
+{% set header_height = 40 %}
 {% set button_height = 40 %}
 {% set column_ratio = 0.4 %}
 {% set left_percent = int(column_ratio * 100) %}
@@ -9,45 +9,50 @@
     (
       "Editor + Viewer"
         | title
-      ~ link(crossorigin="anonymous", rel="stylesheet", href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css")
-      ~ link(rel="stylesheet", href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css")
-      ~ link(rel="stylesheet", href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/monokai.min.css")
+      ~ script(src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js",crossorigin="anonymous")
+      ~ link(rel="stylesheet",href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css",crossorigin="anonymous")
+      ~ link(rel="stylesheet",href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css")
+      ~ link(rel="stylesheet",href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/monokai.min.css")
       ~ script(src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js")
       ~ script(src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/htmlmixed/htmlmixed.min.js")
-      ~ script(crossorigin="anonymous", src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js")
       ~ style(
         """
         .fill-vert {
-          height: calc(100vh - """ ~ (button_height + header_height - 2) ~ """px);
-          min-height: calc(100vh - """ ~ (button_height + header_height - 2) ~ """px);
-          max-height: calc(100vh - """ ~ (button_height + header_height - 2) ~ """px);
+          height: calc(100vh - """ ~ (button_height + header_height + 1) ~ """px);
+          min-height: calc(100vh - """ ~ (button_height + header_height + 1) ~ """px);
+          max-height: calc(100vh - """ ~ (button_height + header_height + 1) ~ """px);
           border: 0;
           outline: 0;
           margin: 0;
           padding: 0;
         }
+
         .left-column {
           width: """ ~ left_percent ~ """%;
           min-width: """ ~ left_percent ~ """%;
           max-width: """ ~ left_percent ~ """%;
         }
+
         .right-column {
           width: """ ~ right_percent ~ """%;
           min-width: """ ~ right_percent ~ """%;
           max-width: """ ~ right_percent ~ """%;
         }
+
         .no-mp {
           margin: 0;
           padding: 0;
           outline: 0;
           border: 0;
         }
+
         .top-header = {
           height: """ ~ header_height ~ """px;
           min-height: """ ~ header_height ~ """px;
           max-height: """ ~ header_height ~ """px;
           line-height: unset;
         }
+
         .bottom-button {
           height: """ ~ button_height ~ """px;
           min-height: """ ~ button_height ~ """px;
@@ -68,6 +73,7 @@
               id="editor",
               name="content",
               classes="fill-vert form-control",
+              placeholder="WTFScript Here"
             ) | div("fill-vert")
         ) | form(
           "fill-vert",
@@ -80,7 +86,8 @@
           "",
           name="viewerFrame",
           id="viewerFrame",
-          style="width:100%; height:99.9%; border:0;",
+          classes="no-mp",
+          style="width:100%; height:100%; display:block; border:0; overflow:hidden;",
           sandbox="allow-same-origin allow-scripts allow-forms"
         ) | bs.col_6("fill-vert right-column no-mp", style="overflow:auto;")
       ) | bs.row("fill-vert no-mp")
@@ -93,7 +100,7 @@
             'lineWrapping: true,' ~
             'theme: "monokai"' ~
           '});' ~
-          'editor.setSize("100%", "calc(100vh - ' ~ (button_height + header_height - 2) ~ 'px)");'
+          'editor.setSize("100%", "calc(100vh - ' ~ (button_height + header_height + 1) ~ 'px)");'
         '});'
       ) | script
       ~ "Render"
@@ -106,3 +113,4 @@
     ) | body("h-100")
   ) | html("h-100")
 }}
+  

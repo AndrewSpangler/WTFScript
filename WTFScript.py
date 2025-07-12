@@ -269,9 +269,11 @@ class WTFScript:
             print(f"Found {len(binds)} binds")
 
             new_binds = {(prefix+"."+k):v for k,v in binds.items()}
-            print("new_binds", json.dumps(list(i for i in new_binds.keys())))
+            # print("New Binds:", json.dumps(list(i for i in new_binds.keys())))
             for k, v in new_binds.items():
                 self._bind(k, v)
+
+            print(f"Loaded {len(binds)} binds")
 
         all_funcs = {
             name: func
@@ -397,7 +399,7 @@ class WTFHtmlFlask(WTFHtml):
         content = super().render(content, *args, **kw)
         return content
 
-class WTFMD(WTFScript):
+class WTFMd(WTFScript):
     def __init__(self, *args, **kw):
         WTFScript.__init__(self, *args, **kw)
         self.load_macros_dir(os.path.join(os.path.dirname(__file__), "macros/markdown/core"))
