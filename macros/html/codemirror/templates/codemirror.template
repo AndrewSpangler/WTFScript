@@ -1,0 +1,50 @@
+{# 
+Base codemirror editor
+SIGNATURE:
+codemirror(
+  content = "",
+  classes =" ",
+  id = "",
+  mode = "",
+  read_only = False,
+  theme = "monokai",
+  line_wrapping = False,
+  line_numbers = True,
+  viewport_margin = "Infinity",
+  no_script = False,
+  width = None,
+  height = None,
+)
+#}
+
+{% macro editor_script() %}
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+const textarea_{{id}} = document.getElementById("{{id}}");
+let form = textarea_{{id}}.form;
+const editor_{{id}} = CodeMirror.fromTextArea(textarea_{{id}}, {
+  mode: "{{mode}}",
+  {% if theme %}theme: "{{theme}}"{% endif %},
+  line_numbers: {{ str(lineNumbers).lower() }},
+  readOnly: {{ str(read_only).lower() }},
+  viewportMargin: {{ viewport_margin }},
+});
+{% if not readonly %}
+form.addEventListener("submit", () => {
+    textarea_{{id}}.value = editor_{{id}}.getValue();
+}); 
+{% endif %}    
+{% if width or height %}
+editor_{{id}}.setSize({{ width|default('null') }}, {{ height|default('null') }});
+{% endif %}
+});
+</script>
+{% endmacro %}
+
+{{
+  (
+    content
+      | textarea(id=id, readonly=read_only)
+    ~ (editor_script() if not no_script else "")
+  ) | safe
+}}

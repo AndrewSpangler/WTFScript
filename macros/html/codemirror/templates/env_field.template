@@ -1,0 +1,32 @@
+{#
+Codemirror ENV Field
+SIGNATURE:
+env_field(
+  field = "",
+  id = "",
+  theme = "monokai",
+  line_wrapping = False,
+  line_numbers = True,
+  viewport_margin = "Infinity",
+  no_script = False,
+  width = None,
+  height = None,
+)
+#}
+
+{{
+  (
+    field_label(field) 
+    ~ field.data
+      | env_editor(
+        id = field.id,
+        theme = theme,
+        line_wrapping = line_wrapping,
+        line_numbers = line_numbers,
+        no_script = no_script,
+        width = width,
+        height = height,
+      )
+    ~ field_errors(field) 
+  ) | safe 
+}}

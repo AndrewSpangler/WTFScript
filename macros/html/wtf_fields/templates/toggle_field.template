@@ -1,0 +1,6 @@
+{{
+  field_label(field)
+  ~ field(class=classes) 
+    | div("form-check form-switch")
+  ~ field_errors(field)
+}}

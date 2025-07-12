@@ -380,7 +380,6 @@ class WTFHtml(WTFScript):
         # content = etree.tostring(document_root, encoding='unicode', pretty_print=True)
         return content
 
-
 class WTFHtmlFlask(WTFHtml):
     def __init__(self, app, *args, **kw):
         self.app = app
@@ -392,8 +391,19 @@ class WTFHtmlFlask(WTFHtml):
         Bind callable as filter/global/method
         """
         super()._bind(name, callback)
-        self.app.jinja_env.filters[name] = callback
-        self.app.jinja_env.globals[name] = callback
+
+        if "." in name:
+            namespace, _name = name.split(".")
+            if hasattr(self, namespace):
+                ns = getattr(self, namespace)
+            else:
+                raise ValueError(f"Tried to bind to invalid namespace {namespace} - {name}")
+            if not namespace in self.app.jinja_env.filters:
+                self.app.jinja_env.filters[namespace] = ns
+                self.app.jinja_env.globals[namespace] = ns
+        else:
+            self.app.jinja_env.filters[name] = callback
+            self.app.jinja_env.globals[name] = callback
 
     def render(self, content: str, *args, **kw) -> str:
         content = super().render(content, *args, **kw)

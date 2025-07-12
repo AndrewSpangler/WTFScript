@@ -1,0 +1,33 @@
+{# 
+Codemirror ENV Editor
+SIGNATURE:
+env_editor(
+  content = "",
+  classes =" ",
+  id = "",
+  theme = "monokai",
+  line_wrapping = False,
+  line_numbers = True,
+  viewport_margin = "Infinity",
+  no_script = False
+  width = None,
+  height = None
+)
+#}
+
+{{
+  codemirror(
+    content,
+    classes = classes,
+    id = id,
+    mode = "properties",
+    read_only = False,
+    theme = theme,
+    line_wrapping = line_wrapping,
+    line_numbers = line_numbers,
+    viewport_margin = viewport_margin,
+    no_script = no_script,
+    width = width,
+    height = height,
+  ) | safe
+}}
