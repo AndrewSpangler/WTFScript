@@ -54,6 +54,19 @@ def yaml_field(
     height = None,
 ): pass
 
+def env_editor(
+    content = "",
+    classes =" ",
+    id = "",
+    theme = "monokai",
+    line_wrapping = False,
+    line_numbers = True,
+    viewport_margin = "Infinity",
+    no_script = False,
+    width = None,
+    height = None,
+): pass
+
 def env_viewer(
     content = "",
     classes = "",
@@ -67,18 +80,7 @@ def env_viewer(
     height = None,
 ): pass
 
-def env_editor(
-    content = "",
-    classes =" ",
-    id = "",
-    theme = "monokai",
-    line_wrapping = False,
-    line_numbers = True,
-    viewport_margin = "Infinity",
-    no_script = False,
-    width = None,
-    height = None,
-): pass
+
 
 def env_field(
     field = "",

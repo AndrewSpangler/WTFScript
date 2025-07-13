@@ -70,13 +70,40 @@ def collect_attribute(itterable:Iterable, attr:str) -> list:
     return [getattr(i, attr) for i in itterable]
 def cattr(*args, **kw): return collect_attribute(*args, **kw)   
 
-def join_collect_attribute(itterable:Iterable, attr:str, join_string="") -> list[object]:
+def join_collect_attribute(itterable:Iterable, attr:str, join_string="") -> str:
     """
     Collects a list of attributes from an itterable,
     joins the results with a string
     """
     return join_string.join([str(getattr(i, attr)) for i in itterable])
 def jcattr(*args, **kw): return join_collect_attribute(*args, **kw)   
+
+def cull(itterable:Iterable, strip=True) -> list[object]:
+    """
+    Removes null / empty values from a list
+    By default strips whitespace from strings
+    """
+    return [
+        x 
+        for x in itterable 
+        if ( 
+            (
+                (x.strip() if strip else x)
+                if (x.strip() if strip else x)
+                else False
+            )
+            if isinstance(x, str) else
+            (x if x else False)
+        )
+    ]
+def jcull(itterable:Iterable, join_string="") -> str:
+    """
+    Cull list and join the results with a string
+    """
+    return join_string.join(cull(itterable))
+
+def capitalize(s:str) -> str:
+    return s.capitalize()
 
 def step_accumulate(iterable: Iterable, callback: Callable, step=1, *args, **kw) -> list[list[object]]:
     """
@@ -124,11 +151,20 @@ def flatten_structure(data: Iterable, level: int = 0) -> list[tuple[int, str]]:
     return flattened
 def flas(*args, **kw): return flatten_structure(*args, **kw)   
 
+class RenderException(Exception):
+     def __init__(self, message=""):
+        self.message = message
+        super().__init__(self.message)
+
 
 class TemplateRenderer:
     def __init__(self, template_str: str, env: Environment):
         self.env = env
-        self.template = self.env.from_string(template_str)
+        try:
+            self.template = self.env.from_string(template_str)
+        except Exception as e:
+            print(traceback.print_exc())
+            raise RenderException(f"Error loading template from string - {template_str}")
 
     def render(self, **kw) -> str:
         return self.template.render(**kw)
@@ -164,7 +200,11 @@ class WTFScript:
         # Step-wise accumulate itterator
         sacc, step_accumulate,
         # Structure flattener for lists operator macros
-        flas, flatten_structure
+        flas, flatten_structure,
+        # Culling to remove empty values from lists
+        cull, jcull,
+        # Capitalize function for accumulators
+        capitalize
     }
 
     # Core python binds
@@ -207,46 +247,67 @@ class WTFScript:
         self.dummy_functions.update(dummy_functions)
         loaded = []
         macros_dir = os.path.join(macros_dir, "templates")
-        # if prefix:
-        #     setattr(self, prefix, ModuleNamespace())
-        #     print("prefix")
-        #     print(getattr(self, prefix))
-        for ent in os.scandir(macros_dir):
-            if ent.name.endswith(".template"):
-                name = ent.name[:-9]
-                with open(ent.path) as f:
-                    template = f.read()
-                self.macros[name] = template
-                func = self.dummy_functions.get(name)
-                sig = inspect.signature(func) if func else None
-                renderer = TemplateRenderer(template, env=self.env)
-                self.renderers[name] = renderer
-                self.signatures[name] = sig
-                filt = self._make_filter(name)
-                self._bind(name, filt)
-                loaded.append(name)
+        if os.path.exists(macros_dir):
+            for ent in os.scandir(macros_dir):
+                if ent.name.endswith(".template"):
+                    _name = ent.name[:-9]
+                    name = (prefix+"." if prefix else "")+_name
+                    
+                    with open(ent.path) as f:
+                        template = f.read()
+                    self.macros[name] = template
+                    func = self.dummy_functions.get(name)
+                    
+                    sig = inspect.signature(func) if func else None
+                    try:
+                        renderer = TemplateRenderer(template, env=self.env)
+                    except Exception as e:
+                        print(f'Error loading renderer for - "{name}" - {e}')
+                        raise e
+                    self.renderers[name] = renderer
+                    self.signatures[name] = sig
+                    filt = self._make_filter(name)
+                    self._bind(name, filt)
+                    loaded.append(name)
         print(f"Loaded ", len(loaded), " filters")
         return loaded
         
     def _bind(self, name: str, callback: Callable) -> None:
         """
-        Bind callable as filter/global/method
+        Bind callable as a Jinja2 global and filter.
+        Supports dotted names like 'bs.button'.
         """
         if name.startswith("_"):
             raise ValueError(
-                f"Cannot bind macro {name} - macros starting \
-                    with underscores are not allowed by WTF_Script")
+                f"Cannot bind macro {name} - macros starting with underscores are not allowed by WTFScript"
+            )
         if name in self.reserved:
             raise ValueError(f"Cannot bind macro {name} - name is reserved.")
+
+        # Always register full dotted name for filter/global access
         self.env.filters[name] = callback
         self.env.globals[name] = callback
 
+        # Create attribute access for dot notation
         if "." in name:
-            namespace, _name = name.split(".")
-            namespace = getattr(self, namespace)
-            setattr(namespace, _name, callback)
+            namespace_name, attr_name = name.split(".", 1)
+
+            # Create namespace if it doesn't exist
+            if not hasattr(self, namespace_name):
+                ns = ModuleNamespace()
+                setattr(self, namespace_name, ns)
+                self.env.globals[namespace_name] = ns
+                self.env.filters[namespace_name] = ns
+            else:
+                ns = getattr(self, namespace_name)
+
+            # Set the function as an attribute of the namespace
+            setattr(ns, attr_name, callback)
+
         else:
+            # Flat attribute
             setattr(self, name, callback)
+
 
     def _load_headers_file(self, path: os.PathLike) -> dict:
         """Load dummy functions for arg checking and bind helpers."""
@@ -257,6 +318,7 @@ class WTFScript:
 
         prefix = getattr(header_module, "prefix", "")
         if prefix:
+            print(f"Creating namespace with prefix - {prefix}")
             ns = ModuleNamespace()
             setattr(self, prefix, ns)
             self.env.filters[prefix] = ns
@@ -276,7 +338,7 @@ class WTFScript:
             print(f"Loaded {len(binds)} binds")
 
         all_funcs = {
-            name: func
+            (prefix+"." if prefix else "")+name: func
             for name, func in inspect.getmembers(header_module, inspect.isfunction)
             if not name.startswith("_")
         }
@@ -359,7 +421,6 @@ class WTFScript:
         return renderer.render(**context)
 
     def render(self, content: str, *args, **kw) -> str:
-        print(content)
         template = self.env.from_string(content)
         return template.render(*args, **kw)
 
@@ -387,23 +448,17 @@ class WTFHtmlFlask(WTFHtml):
         self.load_macros_dir(os.path.join(os.path.dirname(__file__), "macros/html/core"))
 
     def _bind(self, name: str, callback: Callable) -> None:
-        """
-        Bind callable as filter/global/method
-        """
         super()._bind(name, callback)
 
+        self.app.jinja_env.filters[name] = callback
+        self.app.jinja_env.globals[name] = callback
+
         if "." in name:
-            namespace, _name = name.split(".")
-            if hasattr(self, namespace):
-                ns = getattr(self, namespace)
-            else:
-                raise ValueError(f"Tried to bind to invalid namespace {namespace} - {name}")
-            if not namespace in self.app.jinja_env.filters:
-                self.app.jinja_env.filters[namespace] = ns
-                self.app.jinja_env.globals[namespace] = ns
-        else:
-            self.app.jinja_env.filters[name] = callback
-            self.app.jinja_env.globals[name] = callback
+            namespace_name, _ = name.split(".", 1)
+            ns = getattr(self, namespace_name, None)
+            if ns:
+                self.app.jinja_env.filters[namespace_name] = ns
+                self.app.jinja_env.globals[namespace_name] = ns
 
     def render(self, content: str, *args, **kw) -> str:
         content = super().render(content, *args, **kw)

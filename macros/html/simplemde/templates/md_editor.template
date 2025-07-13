@@ -2,11 +2,11 @@
   (
     (content or "")
       | textarea(
-        "form-control textarea-mde-" ~ id ~ " " ~ classes
+        "form-control textarea-mde-" ~ id ~ " " ~ classes,
         id = id,
         rows = rows 
       )
-    ~ md_script(id)
+    ~ mde.md_script(id)
       | script
   )
    | safe

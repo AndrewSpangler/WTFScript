@@ -16,7 +16,7 @@ env_editor(
 #}
 
 {{
-  codemirror(
+  cm.codemirror(
     content,
     classes = classes,
     id = id,

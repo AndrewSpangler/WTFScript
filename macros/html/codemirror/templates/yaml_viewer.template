@@ -16,7 +16,7 @@ yaml_viewer(
 #}
 
 {{ 
-  codemirror(
+  cm.codemirror(
     content,
     classes = classes,
     id = id,

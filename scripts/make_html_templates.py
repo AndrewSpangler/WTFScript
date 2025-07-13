@@ -113,7 +113,7 @@ tags = {
     "th": ["abbr", "colspan", "headers", "rowspan", "scope"],
     "thead": [],
     "time": ["datetime"],
-    "title": [],
+    "": [],
     "tr": [],
     "track": ["default", "kind", "label", "src", "srclang"],
     "u": [],

@@ -135,9 +135,9 @@ def _make_patch_dict():
         "progress_stacked": ("div", "progress-stacked", {}),
     }
 
-    # Add simple divs with underscore keys
+    # Add simple divs
     patched_classes.update({
-        c.replace("-", "_"): ("div", c, {}) for c in simple_divs
+        c: ("div", c, {}) for c in simple_divs
     })
 
     # Add nav and nav-ul
