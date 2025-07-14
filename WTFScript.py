@@ -1,11 +1,15 @@
-import os
-import json
-import inspect
+import datetime
 import importlib
+import inspect
+import json
+import os
 import traceback
 from jinja2 import Environment, BaseLoader
 from typing import Callable, Iterable
 from lxml import etree, html
+
+
+
 
 PYTHON_BINDS = {
     all,
@@ -151,6 +155,81 @@ def flatten_structure(data: Iterable, level: int = 0) -> list[tuple[int, str]]:
     return flattened
 def flas(*args, **kw): return flatten_structure(*args, **kw)   
 
+
+def format_bytes(size:int) -> str:
+    """Nicely formats a byte count"""
+    for suffix in ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']:
+        if size < 1024: break
+        size /= 1024
+    return "{:.2f} {}".format(size, suffix)
+
+
+def format_seconds(time_in_seconds:int)->str:
+    """
+    Formats an integer number of seconds to a nice H:MM:SS format
+    """
+    hours, remainder = divmod(time_in_seconds, 3600)
+    minutes, seconds = divmod(remainder, 60)
+    out = ""
+    if int(hours): out += f"{int(hours)}:"
+    if int(hours) or int(minutes): out += f"{str(int(minutes)).zfill(2)}:"
+    return out + f"{str(int(seconds)).zfill(2)}"
+
+
+def from_timestamp(time_in:int)->datetime.datetime:
+    """
+    Helper function to convert Unix timestamp to datetime object
+    """
+    return datetime.datetime.fromtimestamp(time_in)
+
+
+def from_rfc_timestamp(ts:str) -> datetime.datetime:
+    """Common with Docker, Kubernetes, etc"""
+    ts_trimmed = ts[:26]
+    return datetime.datetime.strptime(ts[:26], "%Y-%m-%dT%H:%M:%S.%f")
+
+
+def pretty_from_timestamp(time_in:int, *args, **kw)->str:
+    return pretty_date(from_timestamp(time_in), *args, **kw)
+
+
+def localize(utc_datetime:datetime.datetime) -> datetime.datetime:
+    """Localize to system timezone"""
+    if not utc_datetime: return None
+    return utc_datetime.replace(tzinfo=datetime.timezone.utc).astimezone()
+
+
+def get_tz_from_localization(local_tz) -> str:
+    """Template helper function to get server's local tz"""
+    return (
+        datetime.datetime.now()
+        .replace(tzinfo=datetime.timezone.utc)
+        .astimezone(local_tz)
+    ).strftime("%Z")
+
+
+def pretty_date(
+        local_datetime: datetime.datetime,
+        seconds: bool = False,
+        minutes: bool = True,
+        hours: bool = True,
+        use24: bool=True,
+        show_tz: bool=False
+    ) -> str:
+    """
+    Helper function to make dates look better
+    """
+    if not local_datetime: return None
+    format_string = f"%m/%d/%y "
+    if hours: format_string += f"%{'H' if use24 else 'I'}"
+    if minutes: format_string += ":%M"
+    if seconds: format_string += ":%S"
+    if not use24: format_string += "%p"
+    if show_tz: format_string += "%Z"
+    t = local_datetime.strftime(format_string)
+    return t
+
+
 class RenderException(Exception):
      def __init__(self, message=""):
         self.message = message
@@ -201,6 +280,7 @@ class WTFScript:
 
     # Core binds that handle iteration in WTFScript
     # Without these, itteration is very hard.
+    # Also includes formatting tools for dates and bytes
     wtf_binds = {
         # Base accumulate itterator
         acc, accumulate,
@@ -217,7 +297,23 @@ class WTFScript:
         # Culling to remove empty values from lists
         cull, jcull,
         # Capitalize function for accumulators
-        capitalize
+        capitalize,
+        # Pretty-print byte counts
+        format_bytes,
+        # Unix timestamp -> datetime
+        from_timestamp,
+        # RFC timestamp -> datetime
+        from_rfc_timestamp,
+        # Seconds -> hh:mm:ss
+        format_seconds,
+        # Pretty-print date
+        pretty_date,
+        # Pretty date from timestamp
+        pretty_from_timestamp,
+        # Localize datetime object
+        localize,
+        # Get local timezone string
+        get_tz_from_localization
     }
 
     # Core python binds
@@ -511,10 +607,10 @@ if __name__ == "__main__":
     wtf.load_macros_dir(macros_dir)
 
     wd = os.path.dirname(__file__)
-    with open(os.path.join(wd, "README.wtf"), "r") as f:
+    with open(os.path.join(wd, "examples/README.wtf"), "r") as f:
         wtf_script=f.read()
     
-    with open(os.path.join(wd, "example.html.wtf"), "r") as f:
+    with open(os.path.join(wd, "examples/example.html.wtf"), "r") as f:
         html_script=f.read()
 
     rendered = wtf.render(

@@ -1,0 +1,87 @@
+{{
+(
+    "WTFScript"
+        | h1
+    ~ "Web Template Format Script Engine"
+        | h2
+    ~ (
+        "WTFScript is a Jinja2-based macro rendering engine for building structured "
+        "content using custom-defined filters and aliases. Macros are stored as "
+        ".template files with arguments specified via dummy functions for argument validation.\n\n"
+    )   | paragraph
+    ~ (
+        "Features"
+            | h2
+        ~ (
+            "Macro-based rendering using Jinja2 filters"
+            , "A simple system to create your own 'cores' for custom languages, or theming"
+            , "Built-in pretty-printed HTML rendering support" 
+            , "Extensible - works with any languge by supplying your own 'core'"
+            , "Write documents once and render it to multiple formats with ease"
+            , "Comes with cores for Markdown, HTML, and Bootstrap (WIP)"
+            , "A simple, self-hosted HTML previewer available called previewer.py"
+            , "The previewer is, of course, written in WTFScript (using the Bootstrap core)."
+            , "A docker file / compose file are included to run the viewer."
+            )   | unorderedlist
+    )
+    ~ (
+        "Examples"
+            | h2
+        ~ (
+            "Render a heading:"
+            , '"Hello World" | h1'
+                | codeblock
+            , "Render a paragraph with a link:"
+            , '"Click here" | link(href="https://example.com")'
+                | codeblock
+            , "Create this readme:"
+            , ("\n{# README.wtf #}\n"+wtf_script.strip()).split("\n")
+                | jacc(codeblock, join_string="\n")
+            , "Render this readme:"
+            , ("\n// WTFScript.py \n"+py_script.strip()).split("\n")
+                | jacc(codeblock, join_string="\n")
+        )   | unorderedlist
+    )
+    ~ (
+        "Core System"
+            | h2
+        ~ "These functions are available in all WTF namespaces\n"
+            | paragraph
+        ~ (
+            "acc / accumulate – Apply a function to a list of items"
+            , "cattr / collect_attribute – Collect attributes from a list of objects"
+            , "jacc / join_accumulate – Apply and join results"
+            , "jcattr / join_collect_attribute – Collect and join attributes"
+            , "sacc / step_accumulate – Group and process lists in steps"
+            , "flas / flatten_structure - Flatten nested lists in the form [(depth, content), ...]"
+        )   | unorderedlist
+        
+        ~ "3 built-in renderers\n"
+            | h5
+        ~ (
+            "HTML\n"
+                | h6,
+            (
+                "Integrated pretty-printer"
+                , "Works great with Flask and SQLAlchemy"
+                , "from WTFScript import WTFHtml as WTF"
+                    | code
+                , ("\n{# example.html.wtf #}\n"+html_script.strip()).split("\n")
+                    | jacc(codeblock, join_string="\n  ")
+            ),
+            "Markdown\n"
+                | h6,
+            (
+                "Great for generating readme files"
+                , "Useful for generating simple markdown to inject into Flask"
+                , "from WTFScript import WTFMd as WTF"
+                    | code
+            )
+        )   | unorderedlist
+    ) 
+    ~ hr()
+    ~ "WTF? - That was easy!"
+        | paragraph
+        | b
+) | safe
+}}

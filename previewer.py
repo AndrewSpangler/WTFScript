@@ -12,7 +12,7 @@ def previewer():
     content = request.form.get("content", "")
     if request.method == "POST":
         return wtf.render(content)
-    return wtf.render_template("./previewer.html.wtf")
+    return wtf.render_template("./examples/previewer.html.wtf")
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=80)
