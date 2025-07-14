@@ -21,15 +21,15 @@ codemirror(
 <script>
 document.addEventListener("DOMContentLoaded", () => {
 const textarea_{{id}} = document.getElementById("{{id}}");
-let form = textarea_{{id}}.form;
 const editor_{{id}} = CodeMirror.fromTextArea(textarea_{{id}}, {
   mode: "{{mode}}",
   {% if theme %}theme: "{{theme}}"{% endif %},
-  line_numbers: {{ str(lineNumbers).lower() }},
+  lineNumbers: {{ str(line_numbers).lower() or "false" }},
   readOnly: {{ str(read_only).lower() }},
   viewportMargin: {{ viewport_margin }},
 });
-{% if not readonly %}
+{% if not read_only %}
+let form = textarea_{{id}}.form;
 form.addEventListener("submit", () => {
     textarea_{{id}}.value = editor_{{id}}.getValue();
 }); 
@@ -43,8 +43,7 @@ editor_{{id}}.setSize({{ width|default('null') }}, {{ height|default('null') }})
 
 {{
   (
-    content
-      | textarea(id=id, readonly=read_only)
+    textarea(content=content, id=id, name=id, readonly=read_only)
     ~ (editor_script() if not no_script else "")
   ) | safe
 }}

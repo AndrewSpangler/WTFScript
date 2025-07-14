@@ -6,8 +6,8 @@
         id = id,
         rows = rows 
       )
-    ~ mde.md_script(id)
-      | script
-  )
-   | safe
+      ~ ""
+        | mde.md_script(id = id)
+        | script
+  ) | safe
 }}

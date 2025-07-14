@@ -1,6 +1,6 @@
 {{
-  field_label(field)
+  wtff.field_label(field)
   ~ field(class=classes) 
     | div("form-check form-switch")
-  ~ field_errors(field)
+  ~ wtff.field_errors(field)
 }}

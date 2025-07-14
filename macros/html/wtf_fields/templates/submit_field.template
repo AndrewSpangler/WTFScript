@@ -1,0 +1,6 @@
+<center>
+    <div class="align-items-center w-50 mb-0 mt-3">
+        {{ field(class=classes) }}
+    </div>
+</center>
+

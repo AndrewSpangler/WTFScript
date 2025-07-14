@@ -1,0 +1,27 @@
+<pre id="{{id}}"
+  class="console mx-0 my-0 px-0 py-0"
+  style="
+    background: #000;
+    color: #fff;
+    overflow-y: auto;
+    overflow-x: auto;
+    width: 100%;
+    box-sizing: border-box;
+    white-space: pre;
+    font-family: 'Consolas', 'Monaco', 'Lucida Console', monospace;
+    font-size: 14px;
+    line-height: 1.4;
+    min-height: calc(14px * 1.4 * 6);
+    max-height: calc(14px * 1.4 * 60);
+    padding: 1rem;
+">{{ content|safe }}</pre>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const preElement = document.getElementById("{{ id }}");
+    const ansi_up = new AnsiUp();
+    const rawText = preElement.textContent || preElement.innerText;
+    const html = ansi_up.ansi_to_html(rawText);
+    preElement.innerHTML = html;
+  });
+</script>

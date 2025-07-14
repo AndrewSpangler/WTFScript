@@ -2,11 +2,12 @@
   (
     wtff.field_label(field) 
     ~ field(
-      "form-control textarea-mde-" ~ field.id ~ " " ~ classes,
-      value = (field.data)
+      class="textarea-mde-" ~ field.id ~ " " ~ classes,
+      value = field.data
     )
     ~ wtff.field_errors(field) 
-    ~ mde.md_script(id)
+    ~ ""
+      | mde.md_script(id = field.id)
       | script
   ) | safe
 }}

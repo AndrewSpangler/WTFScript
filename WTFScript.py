@@ -158,7 +158,8 @@ class RenderException(Exception):
 
 
 class TemplateRenderer:
-    def __init__(self, template_str: str, env: Environment):
+    def __init__(self, name, template_str: str, env: Environment):
+        self.name = name
         self.env = env
         try:
             self.template = self.env.from_string(template_str)
@@ -167,8 +168,20 @@ class TemplateRenderer:
             raise RenderException(f"Error loading template from string - {template_str}")
 
     def render(self, **kw) -> str:
-        return self.template.render(**kw)
-
+        try:
+            return self.template.render(**kw)
+        except Exception as e:
+            try:
+                data = json.dumps(kw, indent=2)
+            except:
+                try:
+                    data = str(kw)
+                except:
+                    data = "Not serializable"
+            
+            print(f"Error rendering - {self.name} with arguments - {data}")
+            raise e
+            
 class ModuleNamespace:
     def __init__(self):
         pass
@@ -260,7 +273,7 @@ class WTFScript:
                     
                     sig = inspect.signature(func) if func else None
                     try:
-                        renderer = TemplateRenderer(template, env=self.env)
+                        renderer = TemplateRenderer(name, template, env=self.env)
                     except Exception as e:
                         print(f'Error loading renderer for - "{name}" - {e}')
                         raise e

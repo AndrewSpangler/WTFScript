@@ -1,5 +1,4 @@
-$(document).ready(function () {
-  $('.textarea-mde-{{id}}').each(function () {
-      new SimpleMDE({ element: this });
-  });
+document.addEventListener("DOMContentLoaded", function () {
+  var el = document.getElementById("{{ id|safe }}");
+  new SimpleMDE({ element: el });
 });
