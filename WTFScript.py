@@ -8,9 +8,6 @@ from jinja2 import Environment, BaseLoader
 from typing import Callable, Iterable
 from lxml import etree, html
 
-
-
-
 PYTHON_BINDS = {
     all,
     any,
@@ -526,8 +523,12 @@ class WTFScript:
                 
         except TypeError as e:
             raise ValueError(f"Invalid arguments for macro '{name}': {e}")
-
-        return renderer.render(**context)
+        
+        try:
+            return renderer.render(**context)
+        except Exception as e:
+            raise ValueError(f"Error rendering macro '{name}': {e}")
+        
 
     def render(self, content: str, *args, **kw) -> str:
         template = self.env.from_string(content)
@@ -553,7 +554,7 @@ class WTFHtml(WTFScript):
 class WTFHtmlFlask(WTFHtml):
     def __init__(self, app, *args, **kw):
         self.app = app
-        WTFHtml.__init__(self, *args, **kw)
+        super().__init__(*args, **kw)
         self.load_macros_dir(os.path.join(os.path.dirname(__file__), "macros/html/core"))
 
     def _bind(self, name: str, callback: Callable) -> None:
@@ -570,8 +571,12 @@ class WTFHtmlFlask(WTFHtml):
                 self.app.jinja_env.globals[namespace_name] = ns
 
     def render(self, content: str, *args, **kw) -> str:
-        content = super().render(content, *args, **kw)
-        return content
+        return super().render(content, *args, **kw)
+
+    @property
+    def jinja_env(self):
+        return self.env
+
 
 class WTFMd(WTFScript):
     def __init__(self, *args, **kw):

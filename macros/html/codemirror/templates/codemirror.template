@@ -43,7 +43,7 @@ editor_{{id}}.setSize({{ width|default('null') }}, {{ height|default('null') }})
 
 {{
   (
-    textarea(content=content, id=id, name=id, readonly=read_only)
+    textarea(content=content or "", id=id, name=id, readonly=read_only)
     ~ (editor_script() if not no_script else "")
   ) | safe
 }}

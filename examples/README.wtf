@@ -22,6 +22,8 @@
             , "A simple, self-hosted HTML previewer available called previewer.py"
             , "The previewer is, of course, written in WTFScript (using the Bootstrap core)."
             , "A docker file / compose file are included to run the viewer."
+            , "The WTFHtmlFlask class supports the Flask-Markdown plugin."
+            , "Just call the markdown plugin on the wtf object to add it. `Markdown(wtf)`"
             )   | unorderedlist
     )
     ~ (

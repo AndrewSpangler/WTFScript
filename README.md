@@ -9,14 +9,11 @@ WTFScript is a Jinja2-based macro rendering engine for building structured conte
 - Extensible - works with any languge by supplying your own 'core'
 - Write documents once and render it to multiple formats with ease
 - Comes with cores for Markdown, HTML, and Bootstrap (WIP)
-<<<<<<< HEAD
 - A simple, self-hosted HTML previewer available called previewer.py
 - The previewer is, of course, written in WTFScript (using the Bootstrap core).
-=======
-- A simple, self-hosted HTML previewer is available with previewer.py
-- The previewer is, of course, written in WTFScript.
->>>>>>> 0f0b03fbf31030182aab34e3fe6d8d9f8fd47791
 - A docker file / compose file are included to run the viewer.
+- The WTFHtmlFlask class supports the Flask-Markdown plugin.
+- Just call the markdown plugin on the wtf object to add it. `Markdown(wtf)`
 
 ## Examples
 - Render a heading:
@@ -50,6 +47,8 @@ WTFScript is a Jinja2-based macro rendering engine for building structured conte
                   , "A simple, self-hosted HTML previewer available called previewer.py"
                   , "The previewer is, of course, written in WTFScript (using the Bootstrap core)."
                   , "A docker file / compose file are included to run the viewer."
+                  , "The WTFHtmlFlask class supports the Flask-Markdown plugin."
+                  , "Just call the markdown plugin on the wtf object to add it. `Markdown(wtf)`"
                   )   | unorderedlist
           )
           ~ (
