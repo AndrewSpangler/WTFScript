@@ -1,4 +1,5 @@
 document.addEventListener("DOMContentLoaded", function () {
   var el = document.getElementById("{{ id|safe }}");
-  new SimpleMDE({ element: el });
+  var mde = new SimpleMDE({ element: el });
+  mde.codemirror.setOption("theme", "{{theme}}");
 });

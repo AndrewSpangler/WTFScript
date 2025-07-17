@@ -7,7 +7,7 @@
     )
     ~ wtff.field_errors(field) 
     ~ ""
-      | mde.md_script(id = field.id)
+      | mde.md_script(id = field.id, theme=theme)
       | script
   ) | safe
 }}

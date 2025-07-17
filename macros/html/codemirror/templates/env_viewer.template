@@ -21,7 +21,7 @@ env_viewer(
     classes = classes,
     id = id,
     mode = "properties",
-    read_only = True,
+    read_only = "nocursor",
     theme = theme,
     line_wrapping = line_wrapping,
     line_numbers = line_numbers,

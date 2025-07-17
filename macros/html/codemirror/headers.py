@@ -14,6 +14,41 @@ def codemirror(
     no_script = False,
     width = None,
     height = None,
+    indent_unit = 4,
+    tab_size = 4,
+    match_brackets = False
+): pass
+
+def code_field(
+    field = "",
+    classes = "",
+    id = "",
+    theme = "monokai",
+    line_wrapping = False,
+    line_numbers = True,
+    viewport_margin = "Infinity",
+    no_script = False,
+    width = None,
+    height = None,
+    indent_unit = 4,
+    tab_size = 4,
+    match_brackets = True
+): pass
+
+def code_editor(
+    content = "",
+    classes = "",
+    id = "",
+    theme = "monokai",
+    line_wrapping = False,
+    line_numbers = True,
+    viewport_margin = "Infinity",
+    no_script = False,
+    width = None,
+    height = None,
+    indent_unit = 4,
+    tab_size = 4,
+    match_brackets = True
 ): pass
 
 def yaml_viewer(
@@ -44,6 +79,7 @@ def yaml_editor(
 
 def yaml_field(
     field = "",
+    classes = "",
     id = "",
     theme = "monokai",
     line_wrapping = False,
@@ -84,6 +120,7 @@ def env_viewer(
 
 def env_field(
     field = "",
+    classes = "",
     id = "",
     theme = "monokai",
     line_wrapping = False,
@@ -92,4 +129,54 @@ def env_field(
     no_script = False,
     width = None,
     height = None,
+): pass
+
+
+
+def python_viewer(
+    content = "",
+    classes = "",
+    id = "",
+    theme = "monokai",
+    line_wrapping = False,
+    line_numbers = True,
+    viewport_margin = "Infinity",
+    no_script = False,
+    width = None,
+    height = None,
+    indent_unit = 4,
+    tab_size = 4,
+    match_brackets = True
+): pass
+
+def python_editor(
+    content = "",
+    classes = "",
+    id = "",
+    theme = "monokai",
+    line_wrapping = False,
+    line_numbers = True,
+    viewport_margin = "Infinity",
+    no_script = False,
+    width = None,
+    height = None,
+    indent_unit = 4,
+    tab_size = 4,
+    match_brackets = True
+): pass
+
+def python_field(
+    field = "",
+    classes = "",
+    id = "",
+    theme = "monokai",
+    line_wrapping = False,
+    line_numbers = True,
+    viewport_margin = "Infinity",
+    no_script = False,
+    width = None,
+    height = None,
+    indent_unit = 4,
+    tab_size = 4,
+    match_brackets = True
 ): pass

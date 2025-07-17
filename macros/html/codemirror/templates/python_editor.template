@@ -1,0 +1,19 @@
+{{ 
+  cm.codemirror(
+    content,
+    classes = classes,
+    id = id,
+    mode = "python",
+    read_only = False,
+    theme = theme,
+    line_wrapping = line_wrapping,
+    line_numbers = line_numbers,
+    viewport_margin = viewport_margin,
+    no_script = no_script,
+    width = width,
+    height = height,
+    indent_unit = indent_unit,
+    tab_size = tab_size,
+    match_brackets = match_brackets
+  ) | safe
+}}

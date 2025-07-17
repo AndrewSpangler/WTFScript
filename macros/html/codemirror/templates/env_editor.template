@@ -29,5 +29,6 @@ env_editor(
     no_script = no_script,
     width = width,
     height = height,
+    match_brackets = False
   ) | safe
 }}

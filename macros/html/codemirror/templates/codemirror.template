@@ -1,33 +1,23 @@
-{# 
-Base codemirror editor
-SIGNATURE:
-codemirror(
-  content = "",
-  classes =" ",
-  id = "",
-  mode = "",
-  read_only = False,
-  theme = "monokai",
-  line_wrapping = False,
-  line_numbers = True,
-  viewport_margin = "Infinity",
-  no_script = False,
-  width = None,
-  height = None,
-)
-#}
-
 {% macro editor_script() %}
 <script>
 document.addEventListener("DOMContentLoaded", () => {
 const textarea_{{id}} = document.getElementById("{{id}}");
 const editor_{{id}} = CodeMirror.fromTextArea(textarea_{{id}}, {
-  mode: "{{mode}}",
+  mode: {{('"'+mode+'",' if isinstance(mode, str) else str(mode)+",")}}
   {% if theme %}theme: "{{theme}}"{% endif %},
   lineNumbers: {{ str(line_numbers).lower() or "false" }},
-  readOnly: {{ str(read_only).lower() }},
+  readOnly:{{ 
+    '"'+str(read_only).lower()+'"'
+    if str(read_only).lower() not in ["true", "false"]
+    else str(read_only).lower()
+  }},
   viewportMargin: {{ viewport_margin }},
+  indentUnit: {{indent_unit or 4 }},
+  tabSize: {{ tab_size or 4 }},
+  matchBrackets: {{ str(match_brackets).lower() or "false" }}
 });
+window.cm_editors = window.cm_editors || {};
+window.cm_editors["{{id}}"] = editor_{{id}};
 {% if not read_only %}
 let form = textarea_{{id}}.form;
 form.addEventListener("submit", () => {
@@ -38,12 +28,13 @@ form.addEventListener("submit", () => {
 editor_{{id}}.setSize({{ width|default('null') }}, {{ height|default('null') }});
 {% endif %}
 });
+
 </script>
 {% endmacro %}
 
 {{
   (
-    textarea(content=content or "", id=id, name=id, readonly=read_only)
+    textarea(content=content or "", id=id, name=id)
     ~ (editor_script() if not no_script else "")
   ) | safe
 }}

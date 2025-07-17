@@ -1,26 +1,9 @@
-{# 
-Codemirror YAML Viewer
-SIGNATURE:
-yaml_viewer(
-  content = "",
-  classes =" ",
-  id = "",
-  theme = "monokai",
-  line_wrapping = False,
-  line_numbers = True,
-  viewport_margin = "Infinity",
-  no_script = False,
-  width = None,
-  height = None,
-)
-#}
-
 {{ 
   cm.codemirror(
     content,
     classes = classes,
     id = id,
-    mode = "yaml",
+    mode = {"name": "python", "version": 3},
     read_only = "nocursor",
     theme = theme,
     line_wrapping = line_wrapping,
@@ -29,5 +12,8 @@ yaml_viewer(
     no_script = no_script,
     width = width,
     height = height,
+    indent_unit = indent_unit,
+    tab_size = tab_size,
+    match_brackets = match_brackets
   ) | safe
 }}

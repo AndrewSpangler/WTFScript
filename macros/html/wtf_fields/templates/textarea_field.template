@@ -1,5 +1,5 @@
 {{ 
   wtff.field_label(field)
-  ~ field(class=classes, placeholder=placeholder)
+  ~ field(class=classes, placeholder=placeholder, rows=1)
   ~ wtff.field_errors(field)
 }}

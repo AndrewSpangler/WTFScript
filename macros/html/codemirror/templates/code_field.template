@@ -1,23 +1,7 @@
-{#
-Codemirror ENV Field
-SIGNATURE:
-env_field(
-  field = "",
-  id = "",
-  theme = "monokai",
-  line_wrapping = False,
-  line_numbers = True,
-  viewport_margin = "Infinity",
-  no_script = False,
-  width = None,
-  height = None,
-)
-#}
-
 {{
   (
     wtff.field_label(field) 
-    ~ cm.env_editor(
+    ~ cm.code_editor(
       field.data,
       classes = classes,
       id = field.id,
@@ -27,6 +11,9 @@ env_field(
       no_script = no_script,
       width = width,
       height = height,
+      indent_unit = indent_unit,
+      tab_size = tab_size,
+      match_brackets = match_brackets
     )
     ~ wtff.field_errors(field) 
   ) | safe 

@@ -7,7 +7,7 @@
         rows = rows 
       )
       ~ ""
-        | mde.md_script(id = id)
+        | mde.md_script(id = id, theme=theme)
         | script
   ) | safe
 }}

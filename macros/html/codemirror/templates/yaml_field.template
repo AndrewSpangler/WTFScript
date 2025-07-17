@@ -19,6 +19,7 @@ yaml_field(
     wtff.field_label(field) 
     ~ cm.yaml_editor(
       field.data,
+      classes = classes,
       id = field.id,
       theme = theme,
       line_wrapping = line_wrapping,
